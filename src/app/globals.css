@@ -40,7 +40,7 @@
   --spacing-section: 5.5rem;
 
   /* Zusätzlicher Haltepunkt unterhalb von `sm` für sehr schmale Geräte. */
-  --breakpoint-xs: 24.5rem;
+  --breakpoint-xs: 23.5rem;
 }
 
 @layer base {
@@ -116,7 +116,7 @@
     padding-inline: 1rem;
   }
 
-  @media (min-width: 24.5rem) {
+  @media (min-width: 23.5rem) {
     .container-page {
       padding-inline: 1.25rem;
     }
