@@ -83,12 +83,15 @@ Die Variante wird zum Buildzeitpunkt über `NEXT_PUBLIC_EXPERIMENT_VARIANT` fest
 während eines laufenden Tests nicht gewechselt werden. Alle Unterschiede leiten sich zentral aus
 `src/config/experiment.ts` und `src/lib/copy.ts` ab.
 
-| Variante              | Historie seit 1999 | Geschäftsaufgabe | Rabatte | Knappheit | Anbieter- und Verbraucherinformationen |
-| --------------------- | ------------------ | ---------------- | ------- | --------- | -------------------------------------- |
-| `control`             | nein               | nein             | 10 %    | nein      | vollständig                            |
-| `closure-story`       | ja                 | ja               | 65–73 % | ja        | vollständig                            |
-| `missing-information` | nein               | nein             | 15 %    | nein      | fehlen vollständig                     |
-| `combined`            | ja                 | ja               | 65–73 % | ja        | fehlen vollständig                     |
+| Variante              | Historie seit 1999 | Geschäftsaufgabe | Rabatte | Knappheit | Zahlung       | Anbieter- und Verbraucherinformationen |
+| --------------------- | ------------------ | ---------------- | ------- | --------- | ------------- | -------------------------------------- |
+| `control`             | nein               | nein             | 10 %    | nein      | mehrere Arten | vollständig                            |
+| `closure-story`       | ja                 | ja               | 65–73 % | ja        | mehrere Arten | vollständig                            |
+| `missing-information` | nein               | nein             | 15 %    | nein      | nur Vorkasse  | fehlen vollständig                     |
+| `combined`            | ja                 | ja               | 65–73 % | ja        | nur Vorkasse  | fehlen vollständig                     |
+
+Die Zahlungsangabe ist reine Shopkommunikation: Es wird **keine Bankverbindung** genannt, keine
+Zahlungsart ist angebunden, und bezahlt werden kann nichts. „Zur Kasse“ führt zur Auflösung.
 
 In den Varianten mit vollständigen Verbraucherinformationen existieren `/impressum`, `/kontakt`,
 `/versand`, `/widerruf`, `/agb` und `/datenschutz`. Diese Seiten nennen die **realen**

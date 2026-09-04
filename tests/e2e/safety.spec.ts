@@ -51,6 +51,18 @@ test.describe("Keine Formulare für Zahlung, Adresse oder Konto", () => {
     });
   }
 
+  test("nennt auf keiner Shopseite eine Bankverbindung", async ({ page }) => {
+    for (const route of SHOP_ROUTES) {
+      await page.goto(route);
+      const text = await page.locator("body").innerText();
+
+      expect(text, `${route} nennt eine IBAN`).not.toMatch(
+        /[A-Z]{2}\d{2}\s?[A-Z0-9]{4}\s?\d{4}\s?\d{4}/,
+      );
+      expect(text, `${route} nennt IBAN oder BIC`).not.toMatch(/\b(IBAN|BIC|Kontoinhaber)\b/i);
+    }
+  });
+
   test("bietet weder Konto noch Newsletter an", async ({ page }) => {
     await page.goto("/");
     const text = (await page.locator("body").innerText()).toLowerCase();
@@ -155,6 +167,7 @@ test.describe("Auflösungsseite", () => {
       "Ungewöhnlich hohe Rabatte",
       "Erfundene Markenhistorie",
       "Erfundene Geschäftsaufgabe",
+      "Zahlung nur per Vorkasse",
       "Fehlende Anbieterkennzeichnung",
       "Fehlende Kontaktadresse",
       "Fehlende Widerrufsinformationen",

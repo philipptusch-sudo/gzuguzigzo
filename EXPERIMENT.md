@@ -30,12 +30,12 @@ ausgewiesen wird, und das dort genannte Projektziel.
 Jede Variante wird als eigenes Deployment mit eigener Build-Konfiguration ausgeliefert. Inhalte
 wechseln während eines laufenden Tests nicht.
 
-| Variante              | Getestetes Merkmal                                                      |
-| --------------------- | ----------------------------------------------------------------------- |
-| `control`             | Neutraler Shop mit vollständigen Angaben und unauffälligen Rabatten.    |
-| `closure-story`       | Erfundene Historie und Geschäftsaufgabe bei vollständigen Angaben.      |
-| `missing-information` | Fehlende Anbieter- und Verbraucherinformationen bei neutralem Auftritt. |
-| `combined`            | Alle Merkmale gleichzeitig.                                             |
+| Variante              | Getestetes Merkmal                                                                                                    |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `control`             | Neutraler Shop mit vollständigen Angaben und unauffälligen Rabatten.                                                  |
+| `closure-story`       | Erfundene Historie und Geschäftsaufgabe bei vollständigen Angaben.                                                    |
+| `missing-information` | Fehlende Anbieter- und Verbraucherinformationen sowie Vorkasse als einzige Zahlungsart, bei sonst neutralem Auftritt. |
+| `combined`            | Alle Merkmale gleichzeitig.                                                                                           |
 
 Der Sinn der Aufteilung: erst der Vergleich zwischen den Varianten erlaubt eine Aussage darüber,
 **welches einzelne Merkmal** eine Ablehnung oder eine Warnung auslöst.

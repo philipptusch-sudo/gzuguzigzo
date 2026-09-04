@@ -9,7 +9,7 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { AddToCartPanel } from "@/components/AddToCartPanel";
 import { ProductCard } from "@/components/ProductCard";
 import { PriceTag } from "@/components/PriceTag";
-import { ChevronRightIcon } from "@/components/icons";
+import { ChevronRightIcon, InfoIcon } from "@/components/icons";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -87,6 +87,14 @@ export default async function ProductPage({ params }: PageProps) {
 
           <AddToCartPanel product={product} />
 
+          <p
+            data-testid="payment-note"
+            className="text-ink-600 mt-5 flex items-start gap-2 text-sm"
+          >
+            <InfoIcon className="text-ink-400 mt-0.5 h-4 w-4 shrink-0" />
+            {copy.payment.note}
+          </p>
+
           {copy.campaignNote ? (
             <p className="border-cream-300 text-ink-600 mt-6 border-t pt-5 text-sm">
               {copy.campaignNote}. Solange der Vorrat reicht.
@@ -120,6 +128,14 @@ export default async function ProductPage({ params }: PageProps) {
                   </li>
                 ))}
               </ul>
+            </Accordion>
+
+            <Accordion title={copy.payment.accordionTitle}>
+              <div className="space-y-3">
+                {copy.payment.accordionBody.map((paragraph) => (
+                  <p key={paragraph.slice(0, 32)}>{paragraph}</p>
+                ))}
+              </div>
             </Accordion>
 
             <Accordion title="Größenübersicht">

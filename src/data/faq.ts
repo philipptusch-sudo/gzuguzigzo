@@ -3,10 +3,14 @@ import { experimentConfig } from "@/config/experiment";
 /**
  * Frequently asked questions.
  *
- * Deliberately limited to the product itself: sizes, cabin dimensions,
- * material, care and guarantee. Delivery, withdrawal, returns and how to reach
- * a merchant are consumer-information topics -- they belong on the pages that
- * exist only in the arms which include them, not in a product FAQ.
+ * Limited to the product itself plus the payment claim: sizes, cabin
+ * dimensions, material, care, guarantee and how payment works. Delivery,
+ * withdrawal, returns and how to reach a merchant are consumer-information
+ * topics -- they belong on the pages that exist only in the arms which include
+ * them, not in a product FAQ.
+ *
+ * The payment answer names a method but never a bank account: no IBAN, no BIC
+ * and no account holder appear anywhere in this project.
  */
 
 export type FaqEntry = {
@@ -70,6 +74,20 @@ export const faqEntries: readonly FaqEntry[] = [
         : ["Ersatzteile für Rollen und Griffe halten wir für unsere Modelle vor."]),
     ],
     featured: true,
+  },
+  {
+    id: "zahlung",
+    question: "Wie kann ich bezahlen?",
+    answer: experimentConfig.signals.prepaymentOnly
+      ? [
+          "Wir liefern ausschliesslich gegen Vorkasse per Überweisung. Andere Zahlungsarten bieten wir nicht an.",
+          "Die Zahlungsinformationen erhältst du im Anschluss an die Bestellung. Sobald der Betrag bei uns eingegangen ist, geht dein Gepäckstück in den Versand.",
+        ]
+      : [
+          "Du kannst per Überweisung, per SEPA-Lastschrift oder mit Kreditkarte bezahlen.",
+          "Die Zahlungsart wählst du im Bestellabschluss aus. Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer.",
+        ],
+    featured: false,
   },
   {
     id: "innenaufteilung",

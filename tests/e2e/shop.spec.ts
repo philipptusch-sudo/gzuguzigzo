@@ -58,6 +58,28 @@ test.describe("Shopansicht", () => {
     await expect(page.getByText("55 × 38 × 22 cm", { exact: true })).toBeVisible();
   });
 
+  test("nennt auf der Produktseite Vorkasse als einzige Zahlungsart", async ({ page }) => {
+    await page.goto("/koffer/auenfels-kabine-38");
+
+    await expect(page.getByTestId("payment-note")).toContainText("Vorkasse");
+
+    // Langfassung im Akkordeon aufklappen
+    await page
+      .locator("summary")
+      .filter({ hasText: /^Zahlung$/ })
+      .click();
+    await expect(page.getByText(/ausschliesslich gegen Vorkasse/)).toBeVisible();
+  });
+
+  test("nennt auf der Produktseite keine Bankverbindung", async ({ page }) => {
+    await page.goto("/koffer/auenfels-kabine-38");
+    const text = await page.locator("body").innerText();
+
+    expect(text).not.toMatch(/\bIBAN\b/i);
+    expect(text).not.toMatch(/\bBIC\b/i);
+    expect(text).not.toMatch(/[A-Z]{2}\d{2}\s?[A-Z0-9]{4}\s?\d{4}/);
+  });
+
   test("verweist von der Produktseite auf ähnliche Modelle", async ({ page }) => {
     await page.goto("/koffer/auenfels-kabine-38");
     await expect(page.getByRole("heading", { name: "Ähnliche Modelle" })).toBeVisible();
@@ -72,6 +94,17 @@ test.describe("Shopansicht", () => {
     for (const forbidden of ["widerruf", "rücksendung", "retoure", "lieferzeit"]) {
       expect(text, `FAQ darf ${forbidden} nicht behandeln`).not.toContain(forbidden);
     }
+  });
+
+  test("beantwortet in der FAQ die Frage nach der Zahlung", async ({ page }) => {
+    await page.goto("/faq");
+
+    const eintrag = page.locator("#zahlung");
+    await expect(eintrag).toContainText("Wie kann ich bezahlen?");
+
+    await eintrag.getByText("Wie kann ich bezahlen?").click();
+    await expect(eintrag).toContainText("Vorkasse");
+    await expect(eintrag).not.toContainText(/IBAN|BIC/i);
   });
 
   test("findet Modelle über die Suche", async ({ page }) => {

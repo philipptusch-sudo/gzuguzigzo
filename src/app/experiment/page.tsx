@@ -62,6 +62,11 @@ export default function ExperimentPage() {
       body: "Hinweise wie „Nur noch wenige Exemplare verfügbar“ stehen hier fest im Quelltext. Sie beruhen auf keinem Lagerbestand.",
     },
     {
+      active: signals.prepaymentOnly,
+      title: "Zahlung nur per Vorkasse",
+      body: "Der Shop nennt Vorkasse per Überweisung als einzige Zahlungsart. Wer im Voraus überweist, hat bei ausbleibender Lieferung kaum eine Möglichkeit, das Geld zurückzuholen – anders als bei Lastschrift, Kreditkarte oder Käuferschutz. Genau deshalb ist Vorkasse als einzige Option ein verbreitetes Merkmal betrügerischer Shops. Eine Bankverbindung wurde hier zu keinem Zeitpunkt genannt, und es konnte nichts überwiesen werden.",
+    },
+    {
       active: !signals.showImprint,
       title: "Fehlende Anbieterkennzeichnung",
       body: "Der Shop nennt keinen Anbieter, keine Rechtsform und keine Registerangaben. Wer hinter einem Shop steht, muss erkennbar sein.",

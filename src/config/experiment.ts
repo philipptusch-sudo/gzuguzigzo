@@ -40,6 +40,12 @@ export type ExperimentSignals = {
   readonly extremeDiscounts: boolean;
   /** Static "only a few left" / "while stocks last" notices. */
   readonly scarcityMessages: boolean;
+  /**
+   * Advance bank transfer named as the only accepted payment method.
+   * A payment claim in the copy only -- no bank details are ever published,
+   * and no payment can be made. See SECURITY.md, section 1.
+   */
+  readonly prepaymentOnly: boolean;
   readonly showImprint: boolean;
   readonly showCompanyAddress: boolean;
   readonly showContactPage: boolean;
@@ -75,6 +81,7 @@ const SIGNALS_BY_VARIANT: Readonly<Record<ExperimentVariant, ExperimentSignals>>
     closureNarrative: false,
     extremeDiscounts: false,
     scarcityMessages: false,
+    prepaymentOnly: false,
     ...FULL_CONSUMER_INFORMATION,
   },
   // Fabricated history and going-out-of-business sale, but the real operator
@@ -83,6 +90,8 @@ const SIGNALS_BY_VARIANT: Readonly<Record<ExperimentVariant, ExperimentSignals>>
     closureNarrative: true,
     extremeDiscounts: true,
     scarcityMessages: true,
+    // Bleibt aus, damit dieser Arm allein die erfundene Historie misst.
+    prepaymentOnly: false,
     ...FULL_CONSUMER_INFORMATION,
   },
   // Neutral communication and moderate prices, but no provider information.
@@ -90,6 +99,10 @@ const SIGNALS_BY_VARIANT: Readonly<Record<ExperimentVariant, ExperimentSignals>>
     closureNarrative: false,
     extremeDiscounts: false,
     scarcityMessages: false,
+    // Gehört zur selben Familie wie die fehlenden Verbraucherinformationen:
+    // Die Verbraucherzentrale nennt problematische Zahlungsangaben als
+    // eigenständiges Warnzeichen.
+    prepaymentOnly: true,
     ...NO_CONSUMER_INFORMATION,
   },
   // Every signal at once.
@@ -97,6 +110,7 @@ const SIGNALS_BY_VARIANT: Readonly<Record<ExperimentVariant, ExperimentSignals>>
     closureNarrative: true,
     extremeDiscounts: true,
     scarcityMessages: true,
+    prepaymentOnly: true,
     ...NO_CONSUMER_INFORMATION,
   },
 };

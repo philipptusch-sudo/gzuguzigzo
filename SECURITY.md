@@ -16,6 +16,21 @@ welcher Test sie absichert. Die Grenzen haben Vorrang vor jedem Design- und Funk
 | Kein Zahlungsanbieter, kein SDK, kein Kreditkartenfeld                                                                                | im gesamten Repository nicht vorhanden  |
 | Sicherheitsschalter dauerhaft auf `false`                                                                                             | `src/config/experiment.ts` → `safety`   |
 
+### Die Zahlungsangabe ist Text, kein Zahlungsweg
+
+In den Varianten `missing-information` und `combined` nennt der Shop Vorkasse per Überweisung als
+einzige Zahlungsart. Das ist eines der untersuchten Warnzeichen — und ausschliesslich eine
+Behauptung im Seitentext.
+
+**Es wird nirgends eine Bankverbindung genannt.** Keine IBAN, keine BIC, kein Kontoinhaber, keine
+Kontonummer, keine Bankleitzahl — weder auf den Produktseiten noch in der FAQ noch sonst im
+Repository. Damit bleibt die Angabe eine Aussage über den Shop, ohne dass ein Cent fliessen
+könnte. Die Auflösungsseite erklärt genau das.
+
+Zwei Tests halten die Grenze: `tests/unit/safety-boundaries.test.ts` sucht im Quelltext nach
+IBAN-Mustern und den Begriffen BIC, Kontoinhaber, Kontonummer und Bankleitzahl;
+`tests/e2e/safety.spec.ts` prüft zusätzlich den ausgelieferten Text jeder Shopseite im Browser.
+
 Abgesichert durch: `tests/unit/site-state.test.ts`, `tests/unit/safety-boundaries.test.ts`,
 `tests/e2e/safety.spec.ts`, `tests/e2e/cart.spec.ts`.
 

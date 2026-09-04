@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { extname, join } from "node:path";
+import { extname, join, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { experimentConfig, EXPERIMENT_VARIANTS, isExperimentVariant } from "@/config/experiment";
 
@@ -53,6 +53,26 @@ describe("Keine Transaktion", () => {
     const paymentFields =
       /(autocomplete="cc-|name="(iban|bic|kartennummer|cardnumber|cvc|cvv)"|type="card")/i;
     expect(findMatches(paymentFields)).toEqual([]);
+  });
+
+  it("nennt nirgends eine Bankverbindung", () => {
+    // Die Zahlungsangabe ist reine Shopkommunikation. Eine IBAN, eine BIC oder
+    // ein Kontoinhaber wären ein echter Zahlungsweg -- und damit verboten.
+    expect(findMatches(/\b[A-Z]{2}\d{2}[\s]?[A-Z0-9]{4}[\s]?\d{4}[\s]?\d{4}/)).toEqual([]);
+    expect(findMatches(/\b(BIC|SWIFT)\b/)).toEqual([]);
+    expect(findMatches(/Kontoinhaber|Kontonummer|Bankleitzahl/i)).toEqual([]);
+  });
+
+  it("nennt Bankverbindungen auch nicht in den Shoptexten", () => {
+    const shopSources = sources.filter(
+      ({ file }) => !file.includes(`${sep}app${sep}experiment${sep}`),
+    );
+    const shopCode = shopSources.map(({ code }) => code).join("\n");
+
+    // "Bankverbindung" darf nur auf der Auflösungsseite vorkommen, dort in der
+    // Erklärung, dass es sie gerade nicht gab.
+    expect(shopCode).not.toMatch(/\bIBAN\b/);
+    expect(shopCode).not.toMatch(/Bankverbindung/i);
   });
 
   it("hat die Transaktionsschalter dauerhaft auf aus", () => {
@@ -160,6 +180,7 @@ describe("Versuchsvarianten", () => {
     expect(experimentConfig.signals.closureNarrative).toBe(true);
     expect(experimentConfig.signals.extremeDiscounts).toBe(true);
     expect(experimentConfig.signals.showImprint).toBe(false);
+    expect(experimentConfig.signals.prepaymentOnly).toBe(true);
   });
 });
 
@@ -186,5 +207,29 @@ describe("Auflösungsseite", () => {
   it("enthält keine fest hinterlegten realen Betreiberdaten", () => {
     const allSources = sources.map(({ code }) => code).join("\n");
     expect(allSources).not.toMatch(/REAL_OPERATOR_NAME\s*=\s*"(?!.*process)/);
+  });
+});
+
+describe("Zahlungsangabe", () => {
+  it("nennt Vorkasse nur in den Armen, die dieses Merkmal untersuchen", async () => {
+    const { experimentConfig: config } = await import("@/config/experiment");
+    // Diese Auslieferung läuft in der kombinierten Variante.
+    expect(config.signals.prepaymentOnly).toBe(true);
+  });
+
+  it("formuliert je nach Arm eine andere Zahlungsangabe", async () => {
+    const { copy } = await import("@/lib/copy");
+
+    expect(copy.payment.note).toContain("Vorkasse");
+    expect(copy.payment.accordionBody.join(" ")).toContain("Vorkasse");
+    // Auch die Langfassung bleibt eine Behauptung ohne Zahlungsweg.
+    expect(copy.payment.accordionBody.join(" ")).not.toMatch(/IBAN|BIC|Kontoinhaber/i);
+  });
+
+  it("erklärt das Merkmal auf der Auflösungsseite", () => {
+    const reveal = readFileSync(join(SRC, "app", "experiment", "page.tsx"), "utf8");
+
+    expect(reveal).toContain("Zahlung nur per Vorkasse");
+    expect(reveal).toContain("signals.prepaymentOnly");
   });
 });

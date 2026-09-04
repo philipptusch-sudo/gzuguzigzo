@@ -71,6 +71,32 @@ export const copy = {
 
   /** Static scarcity notice, or null where the arm does not test scarcity. */
   scarcityNote: (fallback: string): string | null => (signals.scarcityMessages ? fallback : null),
+
+  /**
+   * Payment claim.
+   *
+   * This is copy and nothing else. No bank details are published anywhere on
+   * this site, no payment method is wired up and no payment can be made --
+   * "Zur Kasse" leads to the reveal page. Naming advance transfer as the only
+   * option is itself one of the signals under test: the consumer advice
+   * centres list restrictive payment terms among the typical warning signs.
+   */
+  payment: {
+    /** Short line next to the buy button. */
+    note: signals.prepaymentOnly
+      ? "Zahlung nur per Vorkasse (Überweisung)"
+      : "Zahlung per Überweisung, Lastschrift oder Kreditkarte",
+    accordionTitle: "Zahlung",
+    accordionBody: signals.prepaymentOnly
+      ? [
+          "Wir liefern ausschliesslich gegen Vorkasse per Überweisung. Andere Zahlungsarten bieten wir nicht an.",
+          "Die Zahlungsinformationen erhältst du im Anschluss an die Bestellung. Sobald der Betrag bei uns eingegangen ist, geht dein Gepäckstück in den Versand.",
+        ]
+      : [
+          "Du kannst per Überweisung, per SEPA-Lastschrift oder mit Kreditkarte bezahlen.",
+          "Die Zahlungsart wählst du im Bestellabschluss aus.",
+        ],
+  },
 } as const;
 
 export const NAV_LINKS: readonly { href: string; label: string }[] = [
