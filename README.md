@@ -172,6 +172,12 @@ Alle Bilder liegen lokal unter `public/images` und sind eigens erzeugte SVG-Plat
 Motive später durch echte Aufnahmen ersetzt werden sollen, steht in
 [`IMAGE-BRIEFING.md`](./IMAGE-BRIEFING.md).
 
+## Veröffentlichen
+
+Eine Schritt-für-Schritt-Anleitung für Railway steht in
+[`DEPLOY-RAILWAY.md`](./DEPLOY-RAILWAY.md). Sie deckt Variablen, Domain, Prüfschritte vor dem
+ersten Anzeigentest und den Kill-Switch im Betrieb ab.
+
 ## Vor dem öffentlichen Einsatz
 
 Die Variante mit fehlender Anbieterkennzeichnung darf **erst nach rechtlicher Prüfung und Freigabe**
@@ -184,3 +190,4 @@ Die Variante mit fehlender Anbieterkennzeichnung darf **erst nach rechtlicher Pr
 - [`IMAGE-BRIEFING.md`](./IMAGE-BRIEFING.md) — Bildmotive
 - [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md) — rechtliche Prüfpunkte vor dem Einsatz
 - [`SECURITY.md`](./SECURITY.md) — Sicherheitsgrenzen und ihre technische Umsetzung
+- [`DEPLOY-RAILWAY.md`](./DEPLOY-RAILWAY.md) — Veröffentlichung auf Railway
