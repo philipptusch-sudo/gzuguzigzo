@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img">
+  <rect width="1200" height="1200" fill="#f4efe6"/>
+  <ellipse cx="600" cy="930" rx="320" ry="28" fill="#16233a" opacity="0.12"/>
+  <path d="M250 520 q0-60 90-60 h520 q90 0 90 60 v300 q0 100-120 100 H370 q-120 0-120-100 z" fill="#6b4a2f"/>
+  <path d="M290 520 q310-120 620 0 v40 q-310-110-620 0 z" fill="#ebe3d6"/>
+  <rect x="330" y="560" width="240" height="230" rx="18" fill="#ebe3d6" opacity="0.9"/>
+  <rect x="630" y="560" width="240" height="230" rx="18" fill="#ebe3d6" opacity="0.65"/>
+  <text x="450" y="690" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#16233a" opacity="0.4">Schuhfach</text>
+  <path d="M280 850 h640" stroke="#6b4a2f" stroke-width="24" stroke-linecap="round" opacity="0.9"/>
+</svg>

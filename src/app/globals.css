@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/*
+ * Kofferwerk Auenfels — Gestaltungsraster
+ *
+ * Farbwelt: tiefes Dunkelblau, warmes Creme, Lederbraun, dezentes Messing.
+ * Alle Kombinationen aus Text- und Hintergrundfarbe in diesem Raster liegen
+ * bei mindestens 4.5:1 Kontrast (Fliesstext) bzw. 3:1 (grosse Überschriften).
+ */
+
+@theme {
+  --color-ink-950: #0c1522;
+  --color-ink-900: #16233a;
+  --color-ink-800: #1b2a41;
+  --color-ink-700: #2a3852;
+  --color-ink-600: #3d4c68;
+  --color-ink-400: #6c7893;
+  --color-ink-300: #97a0b4;
+
+  --color-cream-50: #fbf8f3;
+  --color-cream-100: #f7f3ec;
+  --color-cream-200: #efe8dc;
+  --color-cream-300: #e4dac9;
+  --color-cream-400: #d3c5ac;
+
+  --color-leather-700: #4f3722;
+  --color-leather-600: #6b4a2f;
+  --color-leather-500: #87613f;
+
+  --color-brass-700: #7d6229;
+  --color-brass-600: #a8853f;
+  --color-brass-500: #c0a05c;
+
+  --color-burgund-700: #5c2230;
+
+  --font-serif:
+    var(--font-heading), "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --spacing-section: 5.5rem;
+
+  /* Zusätzlicher Haltepunkt unterhalb von `sm` für sehr schmale Geräte. */
+  --breakpoint-xs: 24.5rem;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Anchor targets must not hide behind the sticky header. */
+    scroll-padding-top: 7rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-cream-100);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    /* Lange deutsche Komposita sollen umbrechen statt die Seite zu sprengen. */
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  p,
+  li,
+  dd {
+    overflow-wrap: break-word;
+  }
+
+  /* One consistent, clearly visible focus ring across the whole site. */
+  :focus-visible {
+    outline: 3px solid var(--color-ink-900);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brass-500);
+    color: var(--color-ink-950);
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 82rem;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 24.5rem) {
+    .container-page {
+      padding-inline: 1.25rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* Skip link: visually hidden until focused. */
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    background-color: var(--color-ink-900);
+    color: var(--color-cream-50);
+    padding: 0.75rem 1.25rem;
+    transition: top 150ms ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+}

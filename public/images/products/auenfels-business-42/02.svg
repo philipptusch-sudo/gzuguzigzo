@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img">
+  <rect width="1200" height="1200" fill="#f4efe6"/>
+  <ellipse cx="600" cy="990" rx="300" ry="28" fill="#16233a" opacity="0.12"/>
+  <rect x="300" y="250" width="600" height="700" rx="52" fill="#3f4247"/>
+  <rect x="340" y="300" width="520" height="420" rx="26" fill="#ebe3d6"/>
+  <rect x="378" y="340" width="444" height="330" rx="14" fill="#525f76"/>
+  <rect x="400" y="362" width="400" height="256" rx="8" fill="#ebe3d6" opacity="0.5"/>
+  <path d="M340 750 h520" stroke="#13161b" stroke-width="8" stroke-linecap="round"/>
+  <rect x="360" y="790" width="230" height="110" rx="16" fill="#292c31"/>
+  <rect x="614" y="790" width="230" height="110" rx="16" fill="#292c31"/>
+  <text x="600" y="1070" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#16233a" opacity="0.35">gepolstertes Notebookfach</text>
+</svg>

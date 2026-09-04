@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment: never commit real operator data
+.env
+.env.local
+.env.*.local
+
+# Test output
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+.DS_Store
+*.log

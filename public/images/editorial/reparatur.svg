@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img">
+  <rect width="1200" height="1200" fill="#ebe3d6"/>
+  <rect x="180" y="560" width="840" height="330" rx="40" fill="#1b2a41"/>
+  <line x1="300" y1="590" x2="300" y2="860" stroke="#000c23" stroke-width="8" stroke-linecap="round"/>
+  <line x1="440" y1="590" x2="440" y2="860" stroke="#000c23" stroke-width="8" stroke-linecap="round"/>
+  <line x1="580" y1="590" x2="580" y2="860" stroke="#000c23" stroke-width="8" stroke-linecap="round"/>
+  <line x1="720" y1="590" x2="720" y2="860" stroke="#000c23" stroke-width="8" stroke-linecap="round"/>
+  <line x1="860" y1="590" x2="860" y2="860" stroke="#000c23" stroke-width="8" stroke-linecap="round"/>
+  <path d="M300 520 q-60 40-40 120 q10 40 60 40 h120 q40 0 40-40 v-90 q0-40-40-40 z" fill="#6b4a2f" opacity="0.85"/>
+  <path d="M760 520 q60 40 40 120 q-10 40-60 40 H620 q-40 0-40-40 v-90 q0-40 40-40 z" fill="#6b4a2f" opacity="0.85"/>
+  <rect x="520" y="600" width="160" height="60" rx="16" fill="#a8853f"/>
+  <text x="600" y="1040" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#16233a" opacity="0.3">Reparatur in der Werkstatt</text>
+</svg>
