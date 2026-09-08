@@ -50,16 +50,34 @@ describe("Kassenrouten", () => {
 
   it("erkennt Unterseiten und abschliessende Schrägstriche", () => {
     expect(isCheckoutRoute("/checkout/adresse")).toBe(true);
-    expect(isCheckoutRoute("/kasse/")).toBe(true);
+    expect(isCheckoutRoute("/zahlung/")).toBe(true);
     expect(isCheckoutRoute("/bestellung/bestaetigung")).toBe(true);
   });
 
   it("leitet Kassenrouten auch bei eingeschaltetem Shop um", () => {
     const on = { SITE_ENABLED: "true" };
     expect(shouldRedirectToReveal("/checkout", on)).toBe(true);
-    expect(shouldRedirectToReveal("/kasse", on)).toBe(true);
     expect(shouldRedirectToReveal("/payment", on)).toBe(true);
     expect(shouldRedirectToReveal("/bestellung", on)).toBe(true);
+    expect(shouldRedirectToReveal("/zahlung", on)).toBe(true);
+  });
+
+  it("lässt die Adresseingabe zu, sperrt aber jeden weiteren Bestellschritt", () => {
+    const on = { SITE_ENABLED: "true" };
+
+    // Schritt 1 ist erreichbar; sein einziger Button führt zur Auflösung.
+    expect(isCheckoutRoute("/kasse")).toBe(false);
+    expect(shouldRedirectToReveal("/kasse", on)).toBe(false);
+
+    // Alles, was eine Zahlung oder eine aufgegebene Bestellung nahelegt, nicht.
+    for (const path of ["/kasse/zahlung", "/kasse/bestaetigung", "/warenkorb/kasse"]) {
+      expect(isCheckoutRoute(path), path).toBe(true);
+      expect(shouldRedirectToReveal(path, on), path).toBe(true);
+    }
+  });
+
+  it("sperrt die Adresseingabe bei abgeschaltetem Shop mit", () => {
+    expect(shouldRedirectToReveal("/kasse", { SITE_ENABLED: "false" })).toBe(true);
   });
 
   it("hält reguläre Shoprouten nicht für Kassenrouten", () => {

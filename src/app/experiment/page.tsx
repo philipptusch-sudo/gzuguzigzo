@@ -88,6 +88,11 @@ export default function ExperimentPage() {
     },
     {
       active: true,
+      title: "Kasse und Newsletter ohne Funktion",
+      body: "Die Kasse zeigt drei Schritte an, von denen nur der erste existiert; das Newsletter-Feld meldet beim Absenden einen Fehler. Nicht funktionierende Bestell- und Anmeldewege sind ein häufiges Merkmal überstürzt aufgesetzter Shops. Hier sind sie zugleich die Sicherheitsvorkehrung: Weil nichts angebunden ist, kann auch nichts abfliessen.",
+    },
+    {
+      active: true,
       title: "Neue Shop-Domain",
       body: "Die Domain wurde eigens für dieses Experiment registriert und hat keine Historie. Sehr junge Domains sind ein wiederkehrendes Merkmal von Fake-Shops.",
     },
@@ -135,10 +140,21 @@ export default function ExperimentPage() {
             ))}
           </ul>
           <p className="text-ink-700 mt-6 text-sm leading-relaxed">
-            Der Warenkorb dieser Website liegt ausschliesslich in deinem Browser. Es gibt keine
-            Kasse, kein Zahlungsformular, kein Kundenkonto und kein Kontaktformular. Es wurden zu
-            keinem Zeitpunkt Namen, Anschriften, Telefonnummern, E-Mail-Adressen oder Zahlungsdaten
+            Der Warenkorb dieser Website liegt ausschliesslich in deinem Browser. Es gibt kein
+            Zahlungsformular, kein Kundenkonto und kein Kontaktformular. Es wurden zu keinem
+            Zeitpunkt Namen, Anschriften, Telefonnummern, E-Mail-Adressen oder Zahlungsdaten
             erhoben.
+          </p>
+
+          <p className="text-ink-700 mt-4 text-sm leading-relaxed">
+            <strong className="text-ink-900 font-semibold">
+              Falls du in die Adressfelder der Kasse oder in das Newsletter-Feld etwas eingetippt
+              hast:
+            </strong>{" "}
+            Diese Felder sind Attrappen. Sie gehören zu keinem Formular, haben kein Ziel und werden
+            von keiner Zeile Code ausgelesen. Es wurde nichts abgeschickt, nichts gespeichert und
+            nichts übertragen — das Eingetippte war nur in deinem Browser und ist mit dem Verlassen
+            der Seite verschwunden. Eine Bestellung ist nie zustande gekommen.
           </p>
         </section>
 

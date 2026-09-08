@@ -22,6 +22,9 @@ export function SiteFooter() {
     { href: "/kollektion?kategorie=reisekoffer", label: "Reisekoffer" },
     { href: "/kollektion?kategorie=koffersets", label: "Koffersets" },
     { href: "/faq", label: "FAQ" },
+    ...(experimentConfig.display.newsletterForm
+      ? [{ href: "/newsletter", label: "Newsletter" }]
+      : []),
   ];
 
   const campaignLinks: FooterLink[] = signals.closureNarrative

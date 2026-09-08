@@ -2,15 +2,24 @@ import { expect, test } from "@playwright/test";
 
 const CHECKOUT_ROUTES = [
   "/checkout",
-  "/kasse",
   "/payment",
   "/bestellung",
   "/zahlung",
   "/warenkorb/kasse",
   "/checkout/adresse",
+  "/kasse/zahlung",
+  "/kasse/bestaetigung",
 ];
 
-const SHOP_ROUTES = ["/", "/kollektion", "/koffer/auenfels-kabine-38", "/faq", "/warenkorb"];
+const SHOP_ROUTES = [
+  "/",
+  "/kollektion",
+  "/koffer/auenfels-kabine-38",
+  "/faq",
+  "/warenkorb",
+  "/kasse",
+  "/newsletter",
+];
 
 const SAFETY_STATEMENTS = [
   "Es findet kein Verkauf statt.",
@@ -43,6 +52,8 @@ test.describe("Keine Formulare für Zahlung, Adresse oder Konto", () => {
       await page.goto(route);
 
       await expect(page.locator("form")).toHaveCount(0);
+      await expect(page.locator('button[type="submit"], input[type="submit"]')).toHaveCount(0);
+      await expect(page.locator("input[name]")).toHaveCount(0);
       await expect(
         page.locator(
           'input[type="password"], input[type="email"], input[type="tel"], input[name*="iban" i], input[autocomplete^="cc-"], input[autocomplete*="street" i], input[autocomplete*="postal" i]',
@@ -63,17 +74,12 @@ test.describe("Keine Formulare für Zahlung, Adresse oder Konto", () => {
     }
   });
 
-  test("bietet weder Konto noch Newsletter an", async ({ page }) => {
+  test("bietet kein Kundenkonto an", async ({ page }) => {
     await page.goto("/");
     const text = (await page.locator("body").innerText()).toLowerCase();
 
-    for (const forbidden of [
-      "anmelden",
-      "registrieren",
-      "kundenkonto",
-      "newsletter",
-      "einloggen",
-    ]) {
+    // Der Newsletter-Link darf vorkommen; das Feld dahinter ist eine Attrappe.
+    for (const forbidden of ["registrieren", "kundenkonto", "einloggen", "mein konto"]) {
       expect(text, `Startseite darf ${forbidden} nicht anbieten`).not.toContain(forbidden);
     }
   });
@@ -144,8 +150,23 @@ test.describe("Indexierung", () => {
     const body = await (await request.get("/robots.txt")).text();
 
     expect(body).toContain("Allow: /");
-    expect(body.toLowerCase()).not.toContain("disallow");
+    // Keine Regel darf einzelne Seiten herausgreifen.
     expect(body).not.toContain("/experiment");
+    for (const line of body.split("\n").filter((l) => /^disallow:/i.test(l.trim()))) {
+      expect(line.trim()).toBe("Disallow: /");
+    }
+  });
+
+  test("robots.txt hält KI-Crawler von der gesamten Seite fern", async ({ request }) => {
+    const body = await (await request.get("/robots.txt")).text();
+
+    for (const bot of ["GPTBot", "ClaudeBot", "CCBot", "Google-Extended"]) {
+      expect(body, `KI-Crawler fehlt: ${bot}`).toContain(bot);
+    }
+    // Such- und Werbesysteme bleiben aussen vor.
+    for (const allowed of ["Googlebot", "AdsBot-Google", "bingbot", "facebookexternalhit"]) {
+      expect(body, `darf nicht gesperrt sein: ${allowed}`).not.toContain(allowed);
+    }
   });
 });
 
@@ -172,6 +193,7 @@ test.describe("Auflösungsseite", () => {
       "Fehlende Kontaktadresse",
       "Fehlende Widerrufsinformationen",
       "Fehlende Versandinformationen",
+      "Kasse und Newsletter ohne Funktion",
       "Neue Shop-Domain",
     ]) {
       expect(text, `Warnzeichen fehlt: ${signal}`).toContain(signal);

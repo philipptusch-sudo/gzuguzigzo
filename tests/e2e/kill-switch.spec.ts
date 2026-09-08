@@ -7,6 +7,13 @@ import { expect, request as playwrightRequest, test } from "@playwright/test";
  * flipped in the hosting environment during a live test.
  */
 
+/*
+ * Seriell, weil dieser Block einen eigenen Serverprozess auf einem festen Port
+ * startet. Ohne das verteilt Playwright die Tests auf mehrere Worker, jeder
+ * führt beforeAll aus und sie streiten sich um denselben Port.
+ */
+test.describe.configure({ mode: "serial" });
+
 const PORT = Number(process.env.E2E_KILL_SWITCH_PORT ?? 3199);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
@@ -55,7 +62,15 @@ test.afterAll(() => {
 });
 
 test.describe("Kill-Switch", () => {
-  for (const route of ["/", "/kollektion", "/koffer/auenfels-kabine-38", "/faq", "/warenkorb"]) {
+  for (const route of [
+    "/",
+    "/kollektion",
+    "/koffer/auenfels-kabine-38",
+    "/faq",
+    "/warenkorb",
+    "/kasse",
+    "/newsletter",
+  ]) {
     test(`${route} wird bei SITE_ENABLED=false auf die Auflösung geleitet`, async () => {
       const context = await playwrightRequest.newContext({ baseURL: BASE_URL });
       try {

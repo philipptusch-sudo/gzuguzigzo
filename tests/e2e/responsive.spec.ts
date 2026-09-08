@@ -6,6 +6,8 @@ const ROUTES = [
   "/koffer/auenfels-familie",
   "/warenkorb",
   "/faq",
+  "/kasse",
+  "/newsletter",
   "/experiment",
 ];
 

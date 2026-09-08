@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { COLORS } from "@/data/products";
-import { experimentConfig, REVEAL_ROUTE } from "@/config/experiment";
+import { experimentConfig } from "@/config/experiment";
 import { MAX_QUANTITY_PER_LINE } from "@/lib/cart";
 import { formatEuro } from "@/lib/pricing";
 import { useCart } from "@/context/CartContext";
@@ -12,9 +12,9 @@ import { ChevronRightIcon, MinusIcon, PlusIcon, TrashIcon } from "@/components/i
 /**
  * The basket.
  *
- * "Zur Kasse" is a plain link to the reveal page. There is no order step, no
- * address step and no payment step between the two -- not hidden, not
- * disabled, simply not built.
+ * "Zur Kasse" leads to the address step at /kasse. That step has one button,
+ * and it goes to the reveal page. There is no second step, no order and no
+ * payment -- not hidden, not disabled, simply not built.
  */
 export function CartView() {
   const { totals, items, update, remove, clear, hydrated } = useCart();
@@ -176,12 +176,12 @@ export function CartView() {
           </div>
 
           {/*
-            The checkout link goes straight to the reveal page. `src/proxy.ts`
-            additionally intercepts /checkout, /kasse, /payment and /bestellung
-            in case anyone reaches those by hand.
+            Weiter zur Adresseingabe. `src/proxy.ts` fängt daneben /checkout,
+            /payment, /bestellung und /zahlung ab, damit keine Route erreichbar
+            ist, die eine Bestellung oder eine Zahlung nahelegt.
           */}
           <Link
-            href={REVEAL_ROUTE}
+            href="/kasse"
             data-testid="checkout"
             className="bg-ink-900 text-cream-50 hover:bg-ink-800 mt-7 flex w-full items-center justify-center gap-2 rounded-sm px-8 py-4 text-sm font-medium tracking-wide transition-colors"
           >

@@ -92,10 +92,37 @@ describe("Keine Transaktion", () => {
 });
 
 describe("Keine personenbezogenen Daten", () => {
-  it("enthält kein Adress-, Konto- oder Kontaktformular", () => {
-    const personalFields =
-      /(type="password"|type="email"|type="tel"|autocomplete="(street-address|postal-code|given-name|family-name|email|tel|new-password|current-password)")/i;
+  it("enthält keine Passwort-, E-Mail- oder Telefonfelder", () => {
+    // Die Adress- und Newsletter-Felder sind Attrappen aus reinen Textfeldern.
+    // Feldtypen, die Browser-Autofill auslösen, sind ausgeschlossen: sonst
+    // trüge der Browser echte Daten ein, die niemand eingeben wollte.
+    const personalFields = /(type="password"|type="email"|type="tel")/i;
     expect(findMatches(personalFields)).toEqual([]);
+  });
+
+  it("löst nirgends Browser-Autofill aus", () => {
+    // Kein autocomplete-Token ausser "off".
+    const autofillTokens = sources.flatMap(({ file, code }) =>
+      [...code.matchAll(/autoComplete="([^"]+)"/g)]
+        .filter((match) => match[1] !== "off")
+        .map((match) => `${file.replace(process.cwd(), "")}: ${match[1]}`),
+    );
+    expect(autofillTokens).toEqual([]);
+  });
+
+  it("gibt keinem Eingabefeld einen name, über den es abgeschickt werden könnte", () => {
+    const namedInputs = sources.flatMap(({ file, code }) =>
+      [...code.matchAll(/<input[^>]*\sname=/g)].map(() => file.replace(process.cwd(), "")),
+    );
+    expect(namedInputs).toEqual([]);
+  });
+
+  it("liest die Attrappen-Felder nirgends aus", () => {
+    // Weder per ref noch über das DOM. Die Adressfelder liegen ohnehin in
+    // einer Server Component, für die kein Client-Code ausgeliefert wird.
+    const readsFields =
+      /(getElementById\(\s*["']feld-|querySelector\([^)]*feld-|new FormData|\.elements\b)/;
+    expect(findMatches(readsFields)).toEqual([]);
   });
 
   it("enthält überhaupt kein absendbares Formular", () => {
@@ -152,10 +179,43 @@ describe("Keine technische Täuschung gegenüber Prüfsystemen", () => {
     const { default: robots } = await import("@/app/robots");
     const rules = [robots().rules].flat();
 
+    // Keine Regel darf die Auflösungsseite gesondert behandeln.
     for (const rule of rules) {
-      expect(rule.disallow ?? []).toEqual([]);
+      const paths = [...[rule.allow ?? []].flat(), ...[rule.disallow ?? []].flat()];
+      for (const path of paths) {
+        expect(path).not.toContain("/experiment");
+      }
     }
-    expect(rules.flatMap((rule) => [rule.allow ?? []].flat())).toContain("/");
+  });
+
+  it("lässt Suchmaschinen und Prüfsysteme die ganze Seite crawlen", async () => {
+    const { default: robots } = await import("@/app/robots");
+    const rules = [robots().rules].flat();
+
+    const wildcard = rules.find((rule) => rule.userAgent === "*");
+    expect(wildcard).toBeDefined();
+    expect([wildcard?.allow ?? []].flat()).toContain("/");
+    expect([wildcard?.disallow ?? []].flat()).toEqual([]);
+  });
+
+  it("sperrt KI-Crawler für die gesamte Seite aus, nicht nur für die Auflösung", async () => {
+    const { default: robots } = await import("@/app/robots");
+    const rules = [robots().rules].flat();
+
+    const aiRule = rules.find((rule) => rule.userAgent !== "*");
+    expect(aiRule).toBeDefined();
+    // Ausschluss gilt der ganzen Domain: kein Sonderweg für einzelne Seiten.
+    expect([aiRule?.disallow ?? []].flat()).toEqual(["/"]);
+
+    const agents = [aiRule?.userAgent ?? []].flat().map((a) => a.toLowerCase());
+    for (const bot of ["gptbot", "claudebot", "ccbot", "google-extended"]) {
+      expect(agents, `KI-Crawler fehlt: ${bot}`).toContain(bot);
+    }
+
+    // Werbe- und Suchsysteme müssen weiterhin durchkommen.
+    for (const allowed of ["googlebot", "adsbot-google", "bingbot", "facebookexternalhit"]) {
+      expect(agents, `darf nicht gesperrt sein: ${allowed}`).not.toContain(allowed);
+    }
   });
 });
 

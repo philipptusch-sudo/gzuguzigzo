@@ -88,8 +88,8 @@ Vor der ersten Anzeigenschaltung diese sechs Punkte durchgehen — `DEINE-URL` e
 # 1. Auflösungsseite erreichbar und liefert 200
 curl -s -o /dev/null -w "%{http_code}\n" https://DEINE-URL/experiment
 
-# 2. Kassenrouten leiten auf die Auflösung um (jeweils 307 + Location)
-for p in /checkout /kasse /payment /bestellung; do
+# 2. Bestell- und Zahlungsrouten leiten auf die Auflösung um (jeweils 307 + Location)
+for p in /checkout /payment /bestellung /zahlung /kasse/zahlung; do
   curl -s -o /dev/null -w "$p -> %{http_code} %{redirect_url}\n" https://DEINE-URL$p
 done
 

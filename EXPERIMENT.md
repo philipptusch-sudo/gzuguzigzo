@@ -121,8 +121,9 @@ Für jede Variante getrennt dokumentieren:
 
 1. Variante festlegen (`NEXT_PUBLIC_EXPERIMENT_VARIANT`), Build erzeugen, Commit notieren.
 2. Betreiberangaben in der Hostingumgebung setzen. Ohne sie schlägt der Build fehl.
-3. Deployment prüfen: `/experiment` erreichbar, „Zur Kasse“ führt dorthin, `/checkout` und
-   `/kasse` leiten um, keine externen Anfragen im Netzwerk-Tab.
+3. Deployment prüfen: `/experiment` erreichbar, „Zur Kasse“ führt zu `/kasse` und „Weiter“ von dort
+   zur Auflösung, `/checkout` und `/bestellung` leiten um, Adress- und Newsletter-Feld schicken
+   nichts ab, keine externen Anfragen im Netzwerk-Tab.
 4. Screenshots von Landingpage und Auflösungsseite anlegen.
 5. Fakeshop-Finder-Prüfung durchführen und dokumentieren.
 6. Anzeigen einreichen, Zeitpunkt notieren.

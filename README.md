@@ -106,12 +106,26 @@ ein anderes Signal als eine fehlende Seite.
 /kollektion            Alle Modelle, optional gefiltert (?kategorie=…)
 /koffer/[slug]         Produktdetailseite (acht Modelle)
 /faq                   Häufige Fragen zu Produkt, Maßen, Material, Pflege, Garantie
-/warenkorb             Warenkorb, „Zur Kasse“ führt auf /experiment
+/warenkorb             Warenkorb, „Zur Kasse“ führt zur Adresseingabe
+/kasse                 Adresseingabe (Schritt 1 von 3), „Weiter“ führt auf /experiment
+/newsletter            Anmeldefeld ohne Funktion
 /experiment            Auflösung — immer erreichbar, immer indexierbar
 ```
 
 Zusätzlich nur in `control` und `closure-story`:
 `/impressum`, `/kontakt`, `/versand`, `/widerruf`, `/agb`, `/datenschutz`.
+
+## Attrappen: Kasse und Newsletter
+
+Der Shop zeigt eine Kasse mit Adresseingabe und eine Newsletter-Anmeldung. Beide sehen aus wie
+Eingabemasken und sind keine — ein Shop ganz ohne Kasse wäre so ungewöhnlich, dass er die Bewertung
+allein dadurch verzerren würde.
+
+Es wird nichts gelesen, nichts gespeichert und nichts übertragen. Die Adressfelder liegen in einer
+Server Component, für die überhaupt kein Client-JavaScript ausgeliefert wird; die Felder sind
+unkontrolliert, tragen kein `name`, liegen in keinem `<form>` und haben `autoComplete="off"`, damit
+der Browser keine echte Adresse einträgt. „Weiter“ ist ein Link auf `/experiment`. Details und
+Testabdeckung in [`SECURITY.md`](./SECURITY.md), Abschnitt 2.
 
 ## Kill-Switch
 

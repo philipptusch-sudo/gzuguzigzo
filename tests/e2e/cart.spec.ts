@@ -71,11 +71,15 @@ test.describe("Warenkorb", () => {
     await expect(page.getByTestId("cart-count")).toHaveText("2");
   });
 
-  test("führt „Zur Kasse“ unmittelbar zur Auflösungsseite", async ({ page }) => {
+  test("führt „Zur Kasse“ zur Adresseingabe und von dort zur Auflösung", async ({ page }) => {
     await addToCart(page, "auenfels-kabine-38");
     await page.goto("/warenkorb");
 
     await page.getByTestId("checkout").click();
+    await expect(page).toHaveURL(/\/kasse$/);
+
+    // Ein Schritt, ein Button, und der führt zur Auflösung.
+    await page.getByTestId("checkout-continue").click();
 
     await expect(page).toHaveURL(/\/experiment$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -83,11 +87,15 @@ test.describe("Warenkorb", () => {
     );
   });
 
-  test("zeigt zwischen Warenkorb und Auflösung kein Formular", async ({ page }) => {
+  test("kennt zwischen Adresseingabe und Auflösung keinen weiteren Schritt", async ({ page }) => {
     await addToCart(page, "auenfels-kabine-38");
-    await page.goto("/warenkorb");
+    await page.goto("/kasse");
 
-    await page.getByTestId("checkout").click();
+    // Weder Formular noch Absende-Button, also kein zweiter Schritt.
+    await expect(page.locator("form")).toHaveCount(0);
+    await expect(page.locator('button[type="submit"]')).toHaveCount(0);
+
+    await page.getByTestId("checkout-continue").click();
     await page.waitForURL(/\/experiment$/);
 
     await expect(page.locator("form")).toHaveCount(0);

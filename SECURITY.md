@@ -36,17 +36,49 @@ Abgesichert durch: `tests/unit/site-state.test.ts`, `tests/unit/safety-boundarie
 
 ## 2. Keine personenbezogenen Daten
 
-**Es existiert kein einziges `<form>` auf der Website.**
+**Es existiert kein einziges `<form>` auf der Website.** Damit gibt es kein Absendeziel, und die
+Eingabetaste löst nirgends etwas aus.
 
-Nicht vorhanden: Kundenkonto, Anmeldung, Newsletter, Kontaktformular, Adresseingabe,
-Zahlungsdaten, Telefonnummer, E-Mail-Erfassung, Freitextfelder mit Übertragung.
+Nicht vorhanden: Kundenkonto, Anmeldung, Kontaktformular, Zahlungsdaten, Bestellabschluss.
 
-Zwei Eingabeelemente gibt es, beide ohne Übertragung:
+Eingabefelder gibt es, aber keines davon überträgt oder speichert etwas:
 
-- **Mengenwahl** auf der Produktseite (`<input type="number">`) — verändert nur den lokalen
-  Warenkorb.
-- **Produktsuche** im Kopfbereich (`<input type="search">`) — filtert den lokalen Katalog im
-  Browser. Kein Formular, keine Anfrage, keine Speicherung des Suchbegriffs.
+- **Mengenwahl** auf der Produktseite — verändert nur den lokalen Warenkorb.
+- **Produktsuche** im Kopfbereich — filtert den lokalen Katalog im Browser. Keine Anfrage, keine
+  Speicherung des Suchbegriffs.
+- **Adressfelder in der Kasse** (`/kasse`) — Attrappen, siehe unten.
+- **Newsletter-Feld** (`/newsletter`) — Attrappe, siehe unten.
+
+### Die Attrappen-Felder
+
+Der Shop zeigt eine Kasse mit Adresseingabe und eine Newsletter-Anmeldung. Beides sieht aus wie
+eine Eingabemaske und ist keine. Ein Shop ganz ohne Kasse und ohne Newsletter wäre so ungewöhnlich,
+dass er allein dadurch die Bewertung verzerren würde, die dieses Experiment misst.
+
+Die Sicherheit ergibt sich hier aus dem, was **nicht** da ist:
+
+| Eigenschaft                                                                | Wirkung                                                                                                                                          |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CheckoutAddressFields` ist eine Server Component                          | Für die Adressfelder wird kein Client-JavaScript ausgeliefert. Es existiert kein Code, der lesen könnte, was jemand tippt.                       |
+| Die Felder sind unkontrolliert und haben kein `name`                       | Die Werte leben nur im DOM und sind mit dem Verlassen der Seite weg.                                                                             |
+| Kein `<form>`, kein Absende-Button                                         | Es gibt kein Ziel. „Weiter" ist ein Link auf `/experiment`.                                                                                      |
+| `autoComplete="off"`, `type="text"` statt `type="email"` oder `type="tel"` | Der Browser füllt keine echte Adresse ein, die niemand eingeben wollte. Das ist das realistischste Restrisiko und deshalb gesondert abgesichert. |
+| `NewsletterField` setzt nur ein Boolean                                    | Die Komponente referenziert das Eingabefeld nirgends. Der Knopf zeigt eine Fehlermeldung, sonst nichts.                                          |
+
+Die Kasse hat genau einen Schritt. Die Anzeige nennt drei; Schritt zwei und drei sind Beschriftungen
+ohne Route. Jede Route, die eine Zahlung oder eine aufgegebene Bestellung nahelegt — `/checkout`,
+`/payment`, `/bestellung`, `/zahlung`, `/kasse/zahlung`, `/kasse/bestaetigung` — leitet weiterhin
+auf `/experiment` um.
+
+Die Auflösungsseite spricht das ausdrücklich an: Wer etwas eingetippt hat, liest dort, dass es
+Attrappen waren und nichts abgeschickt, gespeichert oder übertragen wurde.
+
+Abgesichert durch `tests/e2e/checkout.spec.ts`: Der Test füllt jedes Feld aus, klickt auf „Weiter"
+und prüft danach, dass keine Anfrage nach draussen ging, keine Anfrage ausser GET gestellt wurde,
+weder localStorage noch sessionStorage noch Cookies einen der eingetippten Werte enthalten und die
+Felder nach einem Neuladen leer sind. Auf Quelltextebene prüft
+`tests/unit/safety-boundaries.test.ts`, dass kein Feld ein `name` trägt, kein `autocomplete`-Wert
+ausser `off` vorkommt und die Felder nirgends ausgelesen werden.
 
 Der Warenkorb liegt ausschliesslich im `localStorage` des Besuchers und enthält nur
 Produktkennung, Farbe und Menge. Er verlässt den Browser nicht. Es werden keine Cookies gesetzt.
@@ -186,11 +218,28 @@ gilt für ausgelieferte Bilder eine eigene, sehr enge Content-Security-Policy mi
 | Alle Shopseiten | `noindex, follow` | `noindex, follow`      |
 | `/experiment`   | `index, follow`   | `index, follow`        |
 
-`robots.txt` erlaubt das Crawlen aller Seiten (`Allow: /`). Es gibt **keine** Regel, die die
-Auflösungsseite ausschliesst — das wäre ein Verstecken vor Prüfsystemen. `noindex, follow` erlaubt
-Crawlern, den internen Links zu folgen, verhindert aber langfristige organische Auffindbarkeit.
+`robots.txt` erlaubt allen übrigen Crawlern (`User-agent: *`) die gesamte Seite (`Allow: /`). Es
+gibt **keine** Regel, die die Auflösungsseite ausschliesst — das wäre ein Verstecken vor
+Prüfsystemen. `noindex, follow` erlaubt Crawlern, den internen Links zu folgen, verhindert aber
+langfristige organische Auffindbarkeit.
 
 Die Unterscheidung erfolgt nach **Pfad**, nie nach Besucher.
+
+### KI-Crawler
+
+KI-Crawler (GPTBot, ClaudeBot, CCBot, Google-Extended, PerplexityBot und weitere) sind über
+`robots.txt` von der **gesamten Domain** ausgeschlossen — nicht nur von der Auflösungsseite. Eine
+Regel, die allein `/experiment` ausnimmt, wäre genau das selektive Verstecken, das dieses Projekt
+ausschliesst. Der Ausschluss der ganzen Domain behandelt jede Seite gleich und hält zugleich die
+erfundene Marke aus Trainingsdaten und KI-Antworten heraus, was ohnehin wünschenswert ist.
+
+Ausdrücklich **nicht** ausgeschlossen, weil sie funktionieren müssen: Googlebot, AdsBot-Google und
+AdsBot-Google-Mobile (Google-Ads-Prüfung), bingbot und AdIdxBot (Microsoft-Ads-Prüfung), Slurp,
+DuckDuckBot sowie facebookexternalhit (Meta-Vorschau und -Prüfung).
+
+`robots.txt` ist eine Bitte, keine Durchsetzung. Crawler, die sie ignorieren, werden **nicht**
+serverseitig abgewiesen: Besucher nach ihrer Kennung unterschiedlich zu behandeln wäre der Einstieg
+in genau das Cloaking, das Abschnitt 4 ausschliesst.
 
 ## 9. Umgang mit realen Daten
 

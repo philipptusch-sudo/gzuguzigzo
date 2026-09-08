@@ -153,26 +153,57 @@ export const experimentConfig = {
 
   /**
    * Hard safety boundaries. These are constants, not variant-dependent: no
-   * arm of this experiment may ever take an order, a payment or personal data.
+   * arm of this experiment may ever complete an order, take a payment or read
+   * a personal detail.
+   *
+   * The shop shows a checkout view and a newsletter field, but both are inert:
+   * their input elements are uncontrolled, are never read by any code, sit
+   * outside any `<form>` and have no submit target. See `display` below and
+   * SECURITY.md, section 2.
    */
   safety: {
+    /** No order can be completed. Step 1 of the checkout ends at the reveal. */
     enableCheckout: false,
     enablePayments: false,
     enableAccounts: false,
+    /** No subscription is ever created; the field does nothing. */
     enableNewsletter: false,
     enableContactForm: false,
+    /** Nothing typed anywhere is read, stored or transmitted. */
     collectPersonalData: false,
     revealRoute: "/experiment",
   },
+
+  /**
+   * Purely visual elements that make the shop look like a real one. They
+   * display an interaction without performing it -- a shop with neither a
+   * checkout nor a newsletter would be unusual enough to skew the very
+   * assessment this experiment measures.
+   */
+  display: {
+    /** Address step at /kasse, with a three-step indicator. */
+    checkoutForm: true,
+    /** Signup field at /newsletter that never submits. */
+    newsletterForm: true,
+    /** Steps shown in the indicator. Only the first one is ever reachable. */
+    checkoutSteps: ["Lieferadresse", "Versand und Zahlung", "Prüfen und bestellen"],
+  },
 } as const;
 
-/** Routes that must always resolve to the reveal page instead of a checkout. */
+/**
+ * Routes that must always resolve to the reveal page.
+ *
+ * `/kasse` is deliberately NOT on this list any more: it hosts the address
+ * step, whose only button leads to the reveal. Everything that would imply a
+ * placed order or a payment stays unreachable.
+ */
 export const CHECKOUT_ROUTES = [
   "/checkout",
-  "/kasse",
   "/payment",
   "/bestellung",
   "/zahlung",
+  "/kasse/zahlung",
+  "/kasse/bestaetigung",
   "/warenkorb/kasse",
 ] as const;
 
