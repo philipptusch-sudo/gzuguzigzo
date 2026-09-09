@@ -136,8 +136,8 @@ export const experimentConfig = {
     claim: "Reisegepäck seit 1999",
     campaignLine: "Nach 27 Jahren endet unsere Reise.",
     foundedYearClaim: 1999,
-    closureDateLabel: "30. September 2026",
-    closureMonthLabel: "September",
+    closureDateLabel: "31. Oktober 2026",
+    closureMonthLabel: "Oktober",
     closureReason: "Steigende Kosten und fehlende Nachfolge",
     /** Years of trading claimed on the site. Fabricated, like the brand itself. */
     claimedYears: 27,
