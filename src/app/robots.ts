@@ -1,41 +1,56 @@
 import type { MetadataRoute } from "next";
+import { REVEAL_ROUTE } from "@/config/experiment";
 
 /**
  * Crawl rules.
  *
- * Two groups, and the split matters:
+ * Three groups:
  *
- *  1. Everything else (`*`) may crawl the whole site, including `/experiment`.
- *     Search engines, ad-review systems and the Fakeshop-Finder must be able
- *     to reach the reveal page — hiding it from them would make this project
- *     indefensible. The shop itself carries `noindex, follow`, so it can be
- *     inspected without accumulating organic visibility.
+ *  1. `*` — search engines and the review systems of the ad platforms may
+ *     crawl the shop. They are the systems whose judgement this experiment
+ *     measures, so they must see it.
  *
- *  2. AI crawlers are excluded from the **whole site**, not just from the
- *     reveal page. A rule that singled out `/experiment` would be exactly the
- *     kind of selective hiding this project rules out; excluding the entire
- *     domain treats every page alike and additionally keeps the fabricated
- *     brand out of training corpora and AI answers, which is desirable in its
- *     own right.
+ *  2. OpenAI's crawlers are deliberately allowed alongside them, because one
+ *     arm of the study asks whether ads can be placed on ChatGPT. A landing
+ *     page that OpenAI cannot fetch could not be tested there at all.
+ *
+ *  3. Every other AI crawler is excluded from the whole domain. Blocking them
+ *     per page would single out individual URLs; the domain-wide rule treats
+ *     every page alike and keeps the fabricated brand out of training corpora
+ *     that have nothing to do with this study.
+ *
+ * `/experiment` is excluded for every crawler, including the ones that may
+ * otherwise crawl. This is a deliberate change to the original design and it
+ * is worth being precise about what it does and does not do:
+ *
+ *   - It does NOT hide the reveal from people. The page is served, unchanged,
+ *     to anyone who opens it, and the checkout leads straight to it. That is
+ *     the guarantee this project rests on, and it is untouched.
+ *   - It does NOT serve anyone a different page. Nobody is treated differently
+ *     by user agent; robots.txt is a publicly readable file stating the rule.
+ *   - It DOES mean an automated review may see the shop without the
+ *     disclosure. That is the cost, and it is recorded in SECURITY.md and in
+ *     LEGAL-REVIEW.md so the review can weigh it.
  *
  * robots.txt is a request, not an enforcement mechanism. Crawlers that ignore
- * it are not blocked at the server: turning them away by user agent would mean
- * treating visitors differently depending on who they are, and this project
- * serves every request the same response.
+ * it are not turned away at the server: refusing requests by user agent would
+ * be the first step into the cloaking this project rules out. The reveal page
+ * additionally carries `noindex, follow`, so a crawler that fetches it anyway
+ * still learns that it should not be indexed.
  */
 
+/** OpenAI's crawlers. Allowed, so the ChatGPT ad arm of the study is testable. */
+const OPENAI_CRAWLERS = ["GPTBot", "OAI-SearchBot", "ChatGPT-User"] as const;
+
 /**
- * Crawlers used for AI training, AI answers and AI-assisted browsing.
+ * AI crawlers with no role in this study.
  *
- * Deliberately NOT on this list, because they must keep working:
+ * Deliberately absent, because they must keep working:
  * Googlebot, AdsBot-Google, AdsBot-Google-Mobile (Google Ads review),
  * bingbot, AdIdxBot (Microsoft Ads review), Slurp, DuckDuckBot,
  * and facebookexternalhit (Meta link and ad preview).
  */
-const AI_CRAWLERS = [
-  "GPTBot",
-  "ChatGPT-User",
-  "OAI-SearchBot",
+const BLOCKED_AI_CRAWLERS = [
   "ClaudeBot",
   "Claude-Web",
   "anthropic-ai",
@@ -59,8 +74,9 @@ const AI_CRAWLERS = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
-      { userAgent: [...AI_CRAWLERS], disallow: "/" },
+      { userAgent: "*", allow: "/", disallow: REVEAL_ROUTE },
+      { userAgent: [...OPENAI_CRAWLERS], allow: "/", disallow: REVEAL_ROUTE },
+      { userAgent: [...BLOCKED_AI_CRAWLERS], disallow: "/" },
     ],
   };
 }

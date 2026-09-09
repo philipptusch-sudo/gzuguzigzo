@@ -13,9 +13,10 @@ export const metadata: Metadata = {
   title: "Über dieses Experiment",
   description:
     "Kofferwerk Auenfels ist ein erfundener Onlineshop. Diese Seite erklärt das Verbraucherschutzexperiment dahinter.",
-  // The shop is noindex; the reveal page is deliberately not hidden from
-  // crawlers or from any inspection system.
-  robots: { index: true, follow: true },
+  // Auf Wunsch des Projekts auch hier noindex: Die Auflösung soll nicht über
+  // Suchmaschinen auffindbar sein. Für Menschen bleibt sie unverändert
+  // erreichbar -- die Kasse führt direkt hierher.
+  robots: { index: false, follow: true },
 };
 
 /** The four statements that must always be visible, in every variant. */

@@ -139,38 +139,73 @@ test.describe("Indexierung", () => {
     });
   }
 
-  test("die Auflösungsseite bleibt für Crawler erreichbar", async ({ page }) => {
+  test("die Auflösungsseite ist ebenfalls auf noindex gesetzt", async ({ page }) => {
     const response = await page.goto("/experiment");
 
-    expect(response?.headers()["x-robots-tag"]).toBe("index, follow");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "index, follow");
+    expect(response?.headers()["x-robots-tag"]).toBe("noindex, follow");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
   });
 
-  test("robots.txt sperrt die Auflösungsseite nicht aus", async ({ request }) => {
+  test("robots.txt sperrt die Auflösungsseite für jeden Crawler", async ({ request }) => {
     const body = await (await request.get("/robots.txt")).text();
 
     expect(body).toContain("Allow: /");
-    // Keine Regel darf einzelne Seiten herausgreifen.
-    expect(body).not.toContain("/experiment");
-    for (const line of body.split("\n").filter((l) => /^disallow:/i.test(l.trim()))) {
-      expect(line.trim()).toBe("Disallow: /");
+    expect(body).toContain("Disallow: /experiment");
+  });
+
+  test("robots.txt lässt OpenAI und die Prüfsysteme den Shop crawlen", async ({ request }) => {
+    const body = await (await request.get("/robots.txt")).text();
+
+    // Für den ChatGPT-Anzeigentest muss OpenAI den Shop abrufen dürfen.
+    for (const bot of ["GPTBot", "OAI-SearchBot", "ChatGPT-User"]) {
+      expect(body, `OpenAI-Crawler fehlt: ${bot}`).toContain(bot);
+    }
+    // Such- und Werbesysteme werden gar nicht erst erwähnt, laufen also über "*".
+    for (const allowed of ["Googlebot", "AdsBot-Google", "bingbot", "facebookexternalhit"]) {
+      expect(body, `darf nicht gesperrt sein: ${allowed}`).not.toContain(allowed);
     }
   });
 
-  test("robots.txt hält KI-Crawler von der gesamten Seite fern", async ({ request }) => {
+  test("robots.txt hält die übrigen KI-Crawler von der ganzen Seite fern", async ({ request }) => {
     const body = await (await request.get("/robots.txt")).text();
 
-    for (const bot of ["GPTBot", "ClaudeBot", "CCBot", "Google-Extended"]) {
+    for (const bot of ["ClaudeBot", "CCBot", "Google-Extended", "PerplexityBot"]) {
       expect(body, `KI-Crawler fehlt: ${bot}`).toContain(bot);
-    }
-    // Such- und Werbesysteme bleiben aussen vor.
-    for (const allowed of ["Googlebot", "AdsBot-Google", "bingbot", "facebookexternalhit"]) {
-      expect(body, `darf nicht gesperrt sein: ${allowed}`).not.toContain(allowed);
     }
   });
 });
 
 test.describe("Auflösungsseite", () => {
+  test("wird jeder Kennung identisch ausgeliefert", async ({ playwright, baseURL }) => {
+    // Die Crawler-Sperre ist eine Anweisung in robots.txt, keine
+    // Zugangsbeschränkung: Wer /experiment abruft, bekommt dieselbe Seite --
+    // Mensch, Suchmaschine, Prüfsystem oder ausgesperrter KI-Crawler.
+    const agents = [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "Mozilla/5.0 (compatible; GPTBot/1.0; +https://openai.com/gptbot)",
+      "Mozilla/5.0 (compatible; ClaudeBot/1.0)",
+      "AdsBot-Google (+http://www.google.com/adsbot.html)",
+    ];
+
+    const bodies: string[] = [];
+    for (const userAgent of agents) {
+      const context = await playwright.request.newContext({
+        baseURL,
+        extraHTTPHeaders: { "User-Agent": userAgent },
+      });
+      const response = await context.get("/experiment");
+      expect(response.status(), userAgent).toBe(200);
+      bodies.push(await response.text());
+      await context.dispose();
+    }
+
+    for (const body of bodies) {
+      expect(body).toBe(bodies[0]);
+      expect(body).toContain("Es findet kein Verkauf statt.");
+    }
+  });
+
   test("nennt alle vier Sicherheitshinweise", async ({ page }) => {
     await page.goto("/experiment");
     const notice = page.getByTestId("safety-notice");

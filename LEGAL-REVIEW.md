@@ -88,13 +88,27 @@ Kofferwerk Morgenfels, Auenfels Gepäckwerk, Auenfels Reiseatelier.
 - [ ] Werbetreibendenverifizierung: Es werden ausschliesslich echte Unterlagen eingereicht. Ist der
       Ablauf damit durchführbar?
 
-### 3.6 Presse- und Forschungskontext
+### 3.6 Sperre der Auflösungsseite für Crawler
+
+`/experiment` ist in `robots.txt` für jeden Crawler gesperrt und trägt `noindex`. Für Menschen
+bleibt die Seite unverändert erreichbar, und die Kasse führt mit einem Klick dorthin; es wird
+niemandem eine andere Seite ausgeliefert. Eine automatisierte Prüfung kann den Shop dadurch aber
+ohne die Auflösung sehen.
+
+- [ ] Ist es vertretbar, dass ein Prüfsystem den Shop ohne die Auflösung erfassen kann, solange
+      jeder Mensch sie sieht?
+- [ ] Ändert das die Bewertung der Anzeigenschaltung, wenn die Plattform die Auflösung nicht
+      automatisch findet?
+- [ ] Soll die Sperre für die Dauer der Anzeigenprüfung ausgesetzt werden?
+- [ ] Ist dokumentiert, dass die Sperre eine Crawl-Anweisung und keine Zugangsbeschränkung ist?
+
+### 3.7 Presse- und Forschungskontext
 
 - [ ] Ist der journalistische Zweck belegbar dokumentiert?
 - [ ] Ist eine ethische Begleitung oder ein Beirat vorgesehen oder erforderlich?
 - [ ] Ist geklärt, wie mit Rückfragen von Besucherinnen und Besuchern umgegangen wird?
 
-### 3.7 Betrieb
+### 3.8 Betrieb
 
 - [ ] Ist festgelegt, wer den Kill-Switch betätigen darf und wie diese Person erreichbar ist?
 - [ ] Ist eine Reaktionszeit für den Fall vereinbart, dass die Auflösungsseite ausfällt?

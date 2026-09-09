@@ -109,7 +109,7 @@ ein anderes Signal als eine fehlende Seite.
 /warenkorb             Warenkorb, „Zur Kasse“ führt zur Adresseingabe
 /kasse                 Adresseingabe (Schritt 1 von 3), „Weiter“ führt auf /experiment
 /newsletter            Anmeldefeld ohne Funktion
-/experiment            Auflösung — immer erreichbar, immer indexierbar
+/experiment            Auflösung — für Menschen immer erreichbar, für Crawler gesperrt
 ```
 
 Zusätzlich nur in `control` und `closure-story`:

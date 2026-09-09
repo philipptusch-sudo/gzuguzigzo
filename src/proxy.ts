@@ -76,10 +76,10 @@ export default function proxy(request: NextRequest): NextResponse {
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
 
-  // The shop itself must not end up in a search index; the reveal page must
-  // stay crawlable. This is a per-path rule, never a per-visitor one.
-  const isReveal = pathname === REVEAL_ROUTE || pathname.startsWith(`${REVEAL_ROUTE}/`);
-  response.headers.set("X-Robots-Tag", isReveal ? "index, follow" : "noindex, follow");
+  // Nothing here belongs in a search index -- neither the shop nor the reveal
+  // page. Crawlers may still follow the internal links. This is a per-path
+  // rule set identically for every visitor, never a per-visitor one.
+  response.headers.set("X-Robots-Tag", "noindex, follow");
 
   if (search.includes("__variant")) {
     // Guard against accidentally introducing a per-visitor content switch.

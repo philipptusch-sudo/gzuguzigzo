@@ -211,35 +211,51 @@ Zwei bewusste Abweichungen von der strengstmöglichen Form:
 optimiert werden können ausschliesslich Dateien aus dem eigenen `public/`-Verzeichnis. Zusätzlich
 gilt für ausgelieferte Bilder eine eigene, sehr enge Content-Security-Policy mit `sandbox`.
 
-## 8. Indexierung
+## 8. Indexierung und Crawler
 
-| Bereich         | `X-Robots-Tag`    | `<meta name="robots">` |
-| --------------- | ----------------- | ---------------------- |
-| Alle Shopseiten | `noindex, follow` | `noindex, follow`      |
-| `/experiment`   | `index, follow`   | `index, follow`        |
+| Bereich         | `X-Robots-Tag`    | `<meta name="robots">` | robots.txt              |
+| --------------- | ----------------- | ---------------------- | ----------------------- |
+| Alle Shopseiten | `noindex, follow` | `noindex, follow`      | erlaubt                 |
+| `/experiment`   | `noindex, follow` | `noindex, follow`      | `Disallow: /experiment` |
 
-`robots.txt` erlaubt allen übrigen Crawlern (`User-agent: *`) die gesamte Seite (`Allow: /`). Es
-gibt **keine** Regel, die die Auflösungsseite ausschliesst — das wäre ein Verstecken vor
-Prüfsystemen. `noindex, follow` erlaubt Crawlern, den internen Links zu folgen, verhindert aber
-langfristige organische Auffindbarkeit.
+Nichts auf dieser Seite gehört in einen Suchindex. Crawler dürfen den internen Links folgen, damit
+Prüfsysteme den Shop vollständig sehen.
 
-Die Unterscheidung erfolgt nach **Pfad**, nie nach Besucher.
+### Crawler-Gruppen
 
-### KI-Crawler
+| Gruppe                                                                  | Shop     | `/experiment` |
+| ----------------------------------------------------------------------- | -------- | ------------- |
+| `*` (Suchmaschinen, Anzeigenprüfung von Google, Microsoft und Meta)     | erlaubt  | gesperrt      |
+| OpenAI (`GPTBot`, `OAI-SearchBot`, `ChatGPT-User`)                      | erlaubt  | gesperrt      |
+| Übrige KI-Crawler (ClaudeBot, CCBot, Google-Extended, PerplexityBot, …) | gesperrt | gesperrt      |
 
-KI-Crawler (GPTBot, ClaudeBot, CCBot, Google-Extended, PerplexityBot und weitere) sind über
-`robots.txt` von der **gesamten Domain** ausgeschlossen — nicht nur von der Auflösungsseite. Eine
-Regel, die allein `/experiment` ausnimmt, wäre genau das selektive Verstecken, das dieses Projekt
-ausschliesst. Der Ausschluss der ganzen Domain behandelt jede Seite gleich und hält zugleich die
-erfundene Marke aus Trainingsdaten und KI-Antworten heraus, was ohnehin wünschenswert ist.
+OpenAI ist bewusst freigegeben: Ein Teil der Untersuchung fragt, ob sich Anzeigen bei ChatGPT
+schalten lassen. Eine Landingpage, die OpenAI nicht abrufen darf, liesse sich dort nicht testen.
 
-Ausdrücklich **nicht** ausgeschlossen, weil sie funktionieren müssen: Googlebot, AdsBot-Google und
-AdsBot-Google-Mobile (Google-Ads-Prüfung), bingbot und AdIdxBot (Microsoft-Ads-Prüfung), Slurp,
-DuckDuckBot sowie facebookexternalhit (Meta-Vorschau und -Prüfung).
+Die übrigen KI-Crawler sind für die **gesamte Domain** gesperrt, nicht nur für einzelne Seiten. Sie
+spielen für diese Untersuchung keine Rolle, und die erfundene Marke hat in Trainingsdaten nichts zu
+suchen.
 
-`robots.txt` ist eine Bitte, keine Durchsetzung. Crawler, die sie ignorieren, werden **nicht**
-serverseitig abgewiesen: Besucher nach ihrer Kennung unterschiedlich zu behandeln wäre der Einstieg
-in genau das Cloaking, das Abschnitt 4 ausschliesst.
+### Die Sperre der Auflösungsseite
+
+`/experiment` ist für jeden Crawler gesperrt. Das weicht von der ursprünglichen Anlage des Projekts
+ab und ist bewusst so entschieden. Was die Sperre tut und was nicht:
+
+- Sie **verbirgt die Auflösung nicht vor Menschen.** Die Seite wird unverändert an jeden
+  ausgeliefert, der sie aufruft, und die Kasse führt mit einem Klick dorthin. Diese Zusage bleibt
+  unangetastet und ist die Grundlage, auf der das Projekt überhaupt vertretbar ist.
+- Sie **liefert niemandem eine andere Seite.** Es wird nicht nach Kennung unterschieden;
+  `robots.txt` ist eine öffentlich lesbare Datei, die die Regel benennt. Ein Prüfsystem, das die
+  Adresse aufruft, bekommt die vollständige Auflösung.
+- Sie bedeutet aber, dass eine **automatische Prüfung den Shop ohne die Auflösung sehen kann.** Das
+  ist der Preis dieser Entscheidung. Er ist in [`LEGAL-REVIEW.md`](./LEGAL-REVIEW.md),
+  Abschnitt 3.6, als eigener Prüfpunkt vermerkt.
+
+Crawler, die `robots.txt` ignorieren, werden **nicht** serverseitig abgewiesen: Anfragen nach ihrer
+Kennung unterschiedlich zu behandeln wäre der Einstieg in genau das Cloaking, das Abschnitt 4
+ausschliesst. `tests/e2e/safety.spec.ts` ruft `/experiment` mit fünf verschiedenen Kennungen ab —
+Browser, Googlebot, GPTBot, ClaudeBot, AdsBot-Google — und prüft, dass alle fünf denselben
+Statuscode und denselben Seiteninhalt bekommen.
 
 ## 9. Umgang mit realen Daten
 

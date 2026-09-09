@@ -175,47 +175,74 @@ describe("Keine technische Täuschung gegenüber Prüfsystemen", () => {
     expect(requestLayer).not.toMatch(/referer|referrer/i);
   });
 
-  it("versteckt die Auflösungsseite in keiner Robots-Regel", async () => {
+  it("sperrt die Auflösungsseite für jeden Crawler, nicht nur für einzelne", async () => {
     const { default: robots } = await import("@/app/robots");
     const rules = [robots().rules].flat();
 
-    // Keine Regel darf die Auflösungsseite gesondert behandeln.
-    for (const rule of rules) {
-      const paths = [...[rule.allow ?? []].flat(), ...[rule.disallow ?? []].flat()];
-      for (const path of paths) {
-        expect(path).not.toContain("/experiment");
-      }
+    // Jede Gruppe, die überhaupt etwas crawlen darf, muss /experiment ausnehmen.
+    const crawlingGroups = rules.filter((rule) => [rule.allow ?? []].flat().length > 0);
+    expect(crawlingGroups.length).toBeGreaterThan(0);
+
+    for (const rule of crawlingGroups) {
+      expect([rule.disallow ?? []].flat(), String(rule.userAgent)).toContain("/experiment");
     }
   });
 
-  it("lässt Suchmaschinen und Prüfsysteme die ganze Seite crawlen", async () => {
+  it("lässt Suchmaschinen und Prüfsysteme den Shop crawlen", async () => {
     const { default: robots } = await import("@/app/robots");
     const rules = [robots().rules].flat();
 
     const wildcard = rules.find((rule) => rule.userAgent === "*");
     expect(wildcard).toBeDefined();
     expect([wildcard?.allow ?? []].flat()).toContain("/");
-    expect([wildcard?.disallow ?? []].flat()).toEqual([]);
   });
 
-  it("sperrt KI-Crawler für die gesamte Seite aus, nicht nur für die Auflösung", async () => {
+  it("lässt OpenAI zu, damit der ChatGPT-Anzeigentest möglich ist", async () => {
     const { default: robots } = await import("@/app/robots");
     const rules = [robots().rules].flat();
 
-    const aiRule = rules.find((rule) => rule.userAgent !== "*");
-    expect(aiRule).toBeDefined();
-    // Ausschluss gilt der ganzen Domain: kein Sonderweg für einzelne Seiten.
-    expect([aiRule?.disallow ?? []].flat()).toEqual(["/"]);
+    const agents = rules
+      .filter((rule) => [rule.allow ?? []].flat().includes("/"))
+      .flatMap((rule) => [rule.userAgent ?? []].flat())
+      .map((a) => a.toLowerCase());
 
-    const agents = [aiRule?.userAgent ?? []].flat().map((a) => a.toLowerCase());
-    for (const bot of ["gptbot", "claudebot", "ccbot", "google-extended"]) {
+    for (const bot of ["gptbot", "oai-searchbot", "chatgpt-user"]) {
+      expect(agents, `OpenAI-Crawler fehlt in der Freigabe: ${bot}`).toContain(bot);
+    }
+  });
+
+  it("sperrt die übrigen KI-Crawler für die gesamte Seite aus", async () => {
+    const { default: robots } = await import("@/app/robots");
+    const rules = [robots().rules].flat();
+
+    const blocked = rules.find((rule) => [rule.disallow ?? []].flat().includes("/") && !rule.allow);
+    expect(blocked).toBeDefined();
+    expect([blocked?.disallow ?? []].flat()).toEqual(["/"]);
+
+    const agents = [blocked?.userAgent ?? []].flat().map((a) => a.toLowerCase());
+    for (const bot of ["claudebot", "ccbot", "google-extended", "perplexitybot"]) {
       expect(agents, `KI-Crawler fehlt: ${bot}`).toContain(bot);
     }
 
-    // Werbe- und Suchsysteme müssen weiterhin durchkommen.
-    for (const allowed of ["googlebot", "adsbot-google", "bingbot", "facebookexternalhit"]) {
+    // Weder OpenAI noch Such- und Werbesysteme dürfen hier auftauchen.
+    for (const allowed of [
+      "gptbot",
+      "oai-searchbot",
+      "googlebot",
+      "adsbot-google",
+      "bingbot",
+      "facebookexternalhit",
+    ]) {
       expect(agents, `darf nicht gesperrt sein: ${allowed}`).not.toContain(allowed);
     }
+  });
+
+  it("hält die Auflösungsseite trotz Crawler-Sperre für Menschen erreichbar", async () => {
+    // Die Sperre ist eine Crawl-Anweisung, keine Zugangsbeschränkung.
+    const { isAlwaysReachable, shouldRedirectToReveal } = await import("@/lib/site-state");
+
+    expect(isAlwaysReachable("/experiment")).toBe(true);
+    expect(shouldRedirectToReveal("/experiment", { SITE_ENABLED: "false" })).toBe(false);
   });
 });
 
